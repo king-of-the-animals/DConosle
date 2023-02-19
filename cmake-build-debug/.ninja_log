@@ -1,0 +1,13 @@
+# ninja log v5
+2	368	1676646347561634962	CMakeFiles/DConsole.dir/datecslib/helpFunc.cpp.o	39a4f4ac213420f7
+2	998	1676646472464840116	CMakeFiles/DConsole.dir/datecslib/datecslib.cpp.o	3b04ad9528846157
+1	810	1676565681423129856	CMakeFiles/DConsole.dir/datecslib.cpp.o	acd1df26bde40448
+998	1090	1676646472556833313	DConsole	2e043d3f64f205cb
+2	431	1676646471896882131	CMakeFiles/DConsole.dir/datecslib/datecsException.cpp.o	d0ddf537ca3103db
+1	702	1676646472168862007	CMakeFiles/DConsole.dir/main.cpp.o	23867d5e2f00e489
+0	30	1676832731216391199	build.ninja	649af933b707e271
+0	409	1676832731632396573	CMakeFiles/DConsole.dir/src/helpFunc/helpFunc.cpp.o	b9074e1ab611566b
+0	421	1676832731644396728	CMakeFiles/DConsole.dir/src/datecsException/datecsException.cpp.o	bfc6a5c334744781
+0	515	1676832731740397968	CMakeFiles/DConsole.dir/app/main.cpp.o	ab43a43a207172d8
+0	753	1676832731976401017	CMakeFiles/DConsole.dir/src/datecslib/datecslib.cpp.o	500405a67efc3e51
+753	862	1676832732084402411	DConsole	ecd83a5fd1968a9f
