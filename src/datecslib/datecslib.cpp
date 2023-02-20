@@ -156,17 +156,15 @@
         struct pollfd fds;
         fds.fd = fd;
         fds.events = POLLIN;
-        poll(&fds, 1, 500);
+        poll(&fds, 1, 50);
         while (fds.revents & POLLIN) {
-            if (fds.revents & POLLIN) {
                 ret = read(fd, &buff, 1);
                 vec.push_back(buff);
                 if (ret < 0) {
                     cout << "Error in read" << endl;
                     return false;
                 }
-                poll(&fds, 1, 500);
-            }
+                poll(&fds, 1, 50);
         }
         string bittest;
 
