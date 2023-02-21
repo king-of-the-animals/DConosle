@@ -87,10 +87,10 @@ void workWithFile(string port, string file) {
                 cout << "Input -->";
                 cin >> ask;
                 if (ask == 1)
-                    continue;
+                    break;
                 else if (ask == 2) {
                     isSkip=true;
-                    continue;
+                    break;
                 } else
                     return;
             }
@@ -137,6 +137,7 @@ void workWithFileIgnore(string port, string file) {
 
 
 int main(int argc, char *argv[]) {
+    setlocale(LC_ALL,"ru");
     string port;
     int cmd;
     string data;

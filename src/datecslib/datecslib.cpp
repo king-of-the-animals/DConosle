@@ -75,7 +75,9 @@
         ////std::copy(input.begin(), input.end(), arr);
         //<01>
         vec.push_back(ushort(0x1));
-        ushort num = ushort(36 + data.length());
+        int len;
+        ushort *command_ushort = string_to_ushort(data, &len);
+        ushort num = ushort(36 + len);
         //<len>
         vec.push_back(num);
         //<seq>
@@ -84,12 +86,13 @@
         //Добавить команду <cmd>
         vec.push_back(ushort(command));
         //Указатель на массив байтов из строки сmass = {std::ushort *} 0x55555556b6d0  командой
-        ushort *command_ushort = string_to_ushort(data);
-        for (int i = 0; i < data.size(); ++i) {
+
+        for (int i = 0; i < len; ++i) {
             //Добавление в общий массив <data>
             //cout << command_ushort[i] << " ";
             vec.push_back(command_ushort[i]);
         }
+        delete[] command_ushort;
         //<05>
         vec.push_back(ushort(5));
         //<bcc>
@@ -98,6 +101,7 @@
             //Добавление в общий массив <bcc>
             vec.push_back(command_ushort[i]);
         }
+        delete[] command_ushort;
         //<03>
         vec.push_back(ushort(3));
         *lenght = vec.size();

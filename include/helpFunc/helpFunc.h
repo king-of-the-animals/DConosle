@@ -8,7 +8,8 @@
 #include "string"
 
 int GetRandomNumber(int min, int max);
-
-ushort* string_to_ushort(std::string s);
+void Utf8to866(char *s);
+ushort* string_to_ushort(std::string s,int *len);
+unsigned char str_to_hex(const char *szstr);
 
 #endif //DCONSOLE_HELPFUNC_H
