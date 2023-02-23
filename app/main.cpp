@@ -137,21 +137,38 @@ void workWithFileIgnore(string port, string file) {
     datecs.closePort();
 }
 
-void WorkWithSocket(string ip, int command, string data){
+void WorkWithSocket(string ip, int command, string data, bool endles){
     datecslib datecs;
     try {
         datecs.connetSocket(ip);
-        datecs.sendCommandSock(command,data);
-        datecs.readAnswer();
-        cout << "Answer from Printer:" << endl;
-        cout << "--------------------------------" << endl;
-        cout << datecs.getanswerFromPrinter() << endl;
-        cout << "--------------------------------" << endl;
     }
-    catch(datecsException &ex){
-        cout << "Error in socket:"<< endl;
-        cout << ex.what() << endl;
+    catch (datecsException &ex){
+        cerr << "Error in connect" << endl;
+        cerr << ex.what() << endl;
+        return;
     }
+    do {
+        try {
+            datecs.sendCommandSock(command, data);
+            datecs.readAnswer();
+            cout << "Answer from Printer:" << endl;
+            cout << "--------------------------------" << endl;
+            cout << datecs.getanswerFromPrinter() << endl;
+            cout << "--------------------------------" << endl;
+        }
+        catch (datecsException &ex) {
+            cout << "Error in socket:" << endl;
+            cerr << ex.what() << endl;
+        }
+        if(endles) {
+            cout << "Enter cmd" << endl;
+            cin >> command;
+            cout << "Enter data" << endl;
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            getline(cin, data);
+        }
+    }while(endles);
     datecs.closePort();
 }
 void workWithFileSock(string ip, string file) {
@@ -232,27 +249,73 @@ void workWithFileSock(string ip, string file) {
     }
     datecs.closePort();
 }
+void workWithFileSockIgnore(string ip, string file) {
+    datecslib datecs;
+    int trying = 5;
+    if (!datecs.connetSocket(ip)) {
+        cout << "Error in open socket" << endl;
+        return;
+    }
+    cout << "Send command from file " << file << endl;
+    if (!datecs.readFile(file)) {
+        cout << "Error in open file" << endl;
+        return;
+    }
+    cout << "Read file successfully!" << endl;
+    for (auto var: datecs.getCommandFromFile()) {
+        back:
+        cout << "Command:\"" << var.cmd << "\"\tData:\"" << var.data << "\"";
+        try {
+            datecs.sendRead(var.cmd, var.data);
+        }
+        catch (datecsException &ex) {
+            if(string(ex.whatType()) == "timeout"){
+                if(trying<0){
+                    cout << "Timeout. The attempts are over.\n break and exit" << endl;
+                    break;
+                }
+                else {
+                    cout << "Attempting to retry a command due to a timeout\n" << trying-- << " attempts left" << endl;
+                    goto back;
+                }
+            }
+            cout << "\tStatus: bad" << endl;
+            cout << "\nError in send or read command!!!!" << endl;
+            cout << ex.what() << endl;
+        }
 
+        cout << "\tStatus: OK" << endl;
+        for (auto i: datecs.getStatusByte()) {
+            cout << i << endl;
+        }
+        cout << "Answer from Printer:" << endl;
+        cout << "--------------------------------" << endl;
+        cout << datecs.getanswerFromPrinter() << endl;
+        cout << "--------------------------------" << endl;
+    }
+    datecs.closePort();
+}
 
 int main(int argc, char *argv[]) {
     setlocale(LC_ALL,"ru");
+    int type;
     string port;
     int cmd;
     string data;
-    if(argc==5 && string(argv[2])=="-f" && string(argv[3]) == "-i"){
-        workWithFileIgnore(argv[1],argv[4]);
-    }
-    else if(argc==4 && string(argv[2])=="-f"){
-        workWithFile(argv[1],argv[3]);
+    if(argc==6 && string(argv[1]) == "-s" && string(argv[3]) == "-f" && string(argv[4]) == "-i"){
+        workWithFileSockIgnore(argv[2],argv[5]);
     }
     else if(argc==5 && string(argv[1]) == "-s" && string(argv[3]) == "-f"){
         workWithFileSock(argv[2],argv[4]);
     }
     else if(argc==5 && string(argv[1])=="-s"){
-        WorkWithSocket(argv[2], atoi(argv[3]), argv[4]);
+        WorkWithSocket(argv[2], atoi(argv[3]), argv[4],false);
     }
-    else if(argc==4 && string(argv[1])=="-s"){
-        WorkWithSocket(argv[2], atoi(argv[3]), "");
+    else if(argc==5 && string(argv[2])=="-f" && string(argv[3]) == "-i"){
+        workWithFileIgnore(argv[1],argv[4]);
+    }
+    else if(argc==4 && string(argv[2])=="-f"){
+        workWithFile(argv[1],argv[3]);
     }
     else if(argc==4) {
         workNullParam(argv[1], atoi(argv[2]), argv[3], false);
@@ -261,7 +324,16 @@ int main(int argc, char *argv[]) {
         workNullParam(argv[1], atoi(argv[2]), "" , false);
     }
     else{
-        cout << "Enter port" << endl;
+        cout << "Enter type connection(1 - serial; 2-socket)" << endl;
+        cin >> type;
+        if(type==1)
+            cout << "Enter port" << endl;
+        else if(type==2)
+            cout << "Enter ip" << endl;
+        else {
+            cout << "Error type connection " << endl;
+            return -1;
+        }
         cin >> port;
         cout << "Enter cmd" << endl;
         cin >> cmd;
@@ -269,7 +341,10 @@ int main(int argc, char *argv[]) {
         cin.clear();
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
         getline(cin, data);
-        workNullParam(port,cmd,data,true);
+        if(type==1)
+            workNullParam(port,cmd,data,true);
+        else if(type==2)
+            WorkWithSocket(port,cmd,data,true);
     }
 }
 
