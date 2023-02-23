@@ -32,8 +32,10 @@ public:
     datecslib(string port);
     ~datecslib();
     bool openPort(string port);
+    bool connetSocket(string ip);
     bool isOpen();
     bool sendCommand(int command, string data);
+    bool sendCommandSock(int command, string data);
     void closePort();
     bool readAnswer();
     bool sendRead(int command, string data);
@@ -48,7 +50,9 @@ private:
     ifstream fileRead;
     list<cmdData> commandFromFile;
     string answerFromPrinter;
+
     ushort* CsCount(const vector<ushort> &array);
+
 
     bool readFirstByte(u_char &c);
 

@@ -11,9 +11,12 @@
 class datecsException : public std::exception{
 private:
     std::string message_error;
+    std::string type_error;
 public:
-    datecsException(std::string error);
+    datecsException(const char* error);
+    datecsException(std::string error, string type_error="none");
     const char* what();
+    const char* whatType();
 };
 
 

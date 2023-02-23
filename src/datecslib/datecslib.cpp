@@ -4,11 +4,14 @@
 
 #include <sys/poll.h>
 #include <algorithm>
+#include <sys/socket.h>
+#include <arpa/inet.h>
 #include "../../include/datecsException/datecsException.h"
 #include "../../include/datecslib/datecslib.h"
 #include "../../include/helpFunc/helpFunc.h"
 
     bool datecslib::openPort(string port) {
+        closePort();
         seq = 1;
         fd = open(port.c_str() , O_RDWR | O_NOCTTY);
         init_tty(fd);
@@ -277,7 +280,6 @@
                 data = "";
             commandFromFile.push_back({cmd,data});
         }
-        commandFromFile.pop_back();
         fileRead.close();
         return true;
 
@@ -318,7 +320,7 @@
             count++;
         }
         else{
-            throw datecsException("Timeout Exception.\nПК ожидает ответа от фискального регистратора в течение 500 ms, после чего определяет состояние таймаута.");
+            throw datecsException("Timeout Exception.\nПК ожидает ответа от фискального регистратора в течение 500 ms, после чего определяет состояние таймаута.", "timeout");
         }
         if(c == 21)
             throw datecsException("NAK Exception.\nВозникла ошибка формата сообщения или контрольная сумма неверна.");
@@ -328,4 +330,41 @@
         }
         return true;
     }
+
+    bool datecslib::connetSocket(string ip) {
+        struct sockaddr_in serv_addr;
+
+        closePort();
+
+        if((fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+        {
+            throw datecsException("Could not create socket");
+        }
+
+        serv_addr.sin_family = AF_INET;
+        serv_addr.sin_port = htons(9100);
+
+        if(inet_pton(AF_INET, ip.c_str(), &serv_addr.sin_addr)<=0)
+        {
+            throw datecsException("inet_pton error occured");
+        }
+
+        if( connect(fd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
+        {
+            throw datecsException("Connect Failed in open");
+        }
+        return true;
+    }
+
+    bool datecslib::sendCommandSock(int command, string data) {
+        int len=25;
+        unsigned char *arr = CommandFormation(command, data ,&len);
+        int nw = send(fd, arr, len, 0);
+        if ( nw < 0)
+        {
+            return false;
+        }
+        return true;
+    }
+
 
