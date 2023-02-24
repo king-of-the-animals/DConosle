@@ -340,7 +340,6 @@
         {
             throw datecsException("Could not create socket");
         }
-
         serv_addr.sin_family = AF_INET;
         serv_addr.sin_port = htons(9100);
 

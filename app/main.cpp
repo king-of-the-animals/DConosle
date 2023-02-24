@@ -139,18 +139,15 @@ void workWithFileIgnore(string port, string file) {
 
 void WorkWithSocket(string ip, int command, string data, bool endles){
     datecslib datecs;
-    try {
-        datecs.connetSocket(ip);
-    }
-    catch (datecsException &ex){
-        cerr << "Error in connect" << endl;
-        cerr << ex.what() << endl;
+    int trying = 5;
+    if(!datecs.connetSocket(ip)){
+        cout << "Error in open socket" << endl;
         return;
     }
     do {
+        back:
         try {
-            datecs.sendCommandSock(command, data);
-            datecs.readAnswer();
+            datecs.sendRead(command, data);
             cout << "Answer from Printer:" << endl;
             cout << "--------------------------------" << endl;
             cout << datecs.getanswerFromPrinter() << endl;
@@ -159,6 +156,17 @@ void WorkWithSocket(string ip, int command, string data, bool endles){
         catch (datecsException &ex) {
             cout << "Error in socket:" << endl;
             cerr << ex.what() << endl;
+            if(string(ex.whatType()) == "timeout"){
+                if(trying<0){
+                    cout << "Timeout. The attempts are over.\n break and exit" << endl;
+                    break;
+                }
+                else {
+                    cout << "Attempting to retry a command due to a timeout\n" << trying-- << " attempts left" << endl;
+                    goto back;
+                }
+            }
+
         }
         if(endles) {
             cout << "Enter cmd" << endl;
@@ -310,6 +318,9 @@ int main(int argc, char *argv[]) {
     }
     else if(argc==5 && string(argv[1])=="-s"){
         WorkWithSocket(argv[2], atoi(argv[3]), argv[4],false);
+    }
+    else if(argc==4 && string(argv[1])=="-s"){
+        WorkWithSocket(argv[2], atoi(argv[3]), "",false);
     }
     else if(argc==5 && string(argv[2])=="-f" && string(argv[3]) == "-i"){
         workWithFileIgnore(argv[1],argv[4]);
