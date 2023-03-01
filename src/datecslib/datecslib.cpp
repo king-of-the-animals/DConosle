@@ -27,6 +27,7 @@
     }
 
     bool datecslib::sendCommand(int command, string data) {
+        answerFromPrinter = "Status error message";
         if(!isOpen()){
             return false;
         }
@@ -92,7 +93,6 @@
 
         for (int i = 0; i < len; ++i) {
             //Добавление в общий массив <data>
-            //cout << command_ushort[i] << " ";
             vec.push_back(command_ushort[i]);
         }
         delete[] command_ushort;
@@ -156,7 +156,6 @@
 
         int ret = 0;
         status.clear();
-        answerFromPrinter.clear();
         char buff;
         //buff[0] = c;
         vector<char> vec;
@@ -168,7 +167,6 @@
                 ret = read(fd, &buff, 1);
                 vec.push_back(buff);
                 if (ret < 0) {
-                    cout << "Error in read" << endl;
                     return false;
                 }
                 poll(&fds, 1, 50);
@@ -182,8 +180,10 @@
             transcriptStatus(bittest, count);
             count++;
         }
-
         for (int i = 3; i <= int(vec[0]) - 8 - 0x20; i++) {
+            if(i==3) {
+                answerFromPrinter.clear();
+            }
             answerFromPrinter += vec[i];
         }
         return true;
@@ -262,6 +262,10 @@
     }
 
     bool datecslib::readFile(string path) {
+        struct tm *u;
+        const time_t timer = time(NULL);
+        u = localtime(&timer);
+
         int cmd;
         string data;
         fileRead.open(path);
@@ -274,6 +278,8 @@
             data.erase(0,1);
             string cp = data;
             cp.erase(remove(cp.begin(),cp.end(),' '),cp.end());
+            if (cmd == 61 && to_lower(data)=="setdatetimefrompc")
+                data = date_to_printer_format(u);
             if(cmd == 115)
                 data = cp;
             if(cp=="null")
@@ -291,11 +297,9 @@
 
     bool datecslib::sendRead(int command, string data) {
         if(!sendCommand(command,data)) {
-            cout << "\nError in send" << endl;
             return false;
         }
         if(!readAnswer()) {
-            cout << "\nError in read" << endl;
             return false;
         }
         return true;

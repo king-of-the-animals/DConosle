@@ -1,9 +1,14 @@
 #include <iostream>
 #include <limits>
 #include "../include/userFunc/userFunc.h"
+#include <time.h>
 
 int main(int argc, char *argv[]) {
     setlocale(LC_ALL,"ru");
+
+    std::cout << "Питон для лохов с++ для мужиков!!!"<< endl;
+
+
     int type;
     string port;
     int cmd;

@@ -1,10 +1,11 @@
 //
 // Created by danil on 17.02.23.
 //
-
+#include <algorithm>
 #include <ctime>
 #include <iostream>
 #include <vector>
+#include <time.h>
 #include "../../include/helpFunc/helpFunc.h"
 
 
@@ -60,6 +61,18 @@ ushort* string_to_ushort(std::string s, int *len) {
                 ushorts.push_back((unsigned char) 209);
             else if((unsigned char)s[i+1] == 172)
                 ushorts.push_back((unsigned char) 220);
+            else if((unsigned char)s[i+1] == 150)
+                ushorts.push_back((unsigned char) 198);
+            else if((unsigned char)s[i+1] == 151)
+                ushorts.push_back((unsigned char) 199);
+            else if((unsigned char)s[i+1] == 152)
+                ushorts.push_back((unsigned char) 200);
+            else if((unsigned char)s[i+1] == 155)
+                ushorts.push_back((unsigned char) 203);
+            else if((unsigned char)s[i+1] == 156)
+                ushorts.push_back((unsigned char) 204);
+            else if((unsigned char)s[i+1] == 157)
+                ushorts.push_back((unsigned char) 205);
             else
                 ushorts.push_back((unsigned char) s[i+1]+48);
             i++;
@@ -86,6 +99,38 @@ ushort* string_to_ushort(std::string s, int *len) {
                 case 140:
                     ushorts.push_back((unsigned char)252);
                     break;
+                case 128:
+                    ushorts.push_back((unsigned char)240);
+                    break;
+                case 130:
+                    ushorts.push_back((unsigned char)242);
+                    break;
+                case 132:
+                    ushorts.push_back((unsigned char)244);
+                    break;
+                case 133:
+                    ushorts.push_back((unsigned char)245);
+                    break;
+                case 134:
+                    ushorts.push_back((unsigned char)246);
+                    break;
+                case 135:
+                    ushorts.push_back((unsigned char)247);
+                    break;
+                case 136:
+                    ushorts.push_back((unsigned char)248);
+                    break;
+                case 137:
+                    ushorts.push_back((unsigned char)249);
+                    break;
+                case 142:
+                    ushorts.push_back((unsigned char)254);
+                    break;
+                case 143:
+                    ushorts.push_back((unsigned char)255);
+                    break;
+
+
             }
             i++;
         }
@@ -93,6 +138,9 @@ ushort* string_to_ushort(std::string s, int *len) {
             switch ((unsigned char) s[i+1]+29) {
                 case 145:
                     ushorts.push_back((unsigned char)180);
+                    break;
+                case 144:
+                    ushorts.push_back((unsigned char)165);
                     break;
             }
             i++;
@@ -108,4 +156,19 @@ ushort* string_to_ushort(std::string s, int *len) {
     ushort *arr = new ushort[ushorts.size()];
     std::copy(ushorts.begin(), ushorts.end(), arr);
     return arr;
+}
+std::string date_to_printer_format(tm *time){
+    return std::string((time->tm_mday<10? "0" + std::to_string(time->tm_mday) : std::to_string(time->tm_mday)) +
+    "-" + (time->tm_mon+1<10? "0" + std::to_string(time->tm_mon+1) : std::to_string(time->tm_mon+1))  +
+    "-" + std::to_string(time->tm_year-100) +
+    " " + (time->tm_hour<10? "0" + std::to_string(time->tm_hour) : std::to_string(time->tm_hour))+
+    ":" + (time->tm_min<10? "0" + std::to_string(time->tm_min) : std::to_string(time->tm_min))+
+    ":" + (time->tm_sec<10? "0" + std::to_string(time->tm_sec) : std::to_string(time->tm_sec)));
+}
+
+std::string to_lower(std::string s){
+    std::string news = "";
+    for (auto vat : s)
+        news.push_back(std::tolower(vat));
+    return news;
 }

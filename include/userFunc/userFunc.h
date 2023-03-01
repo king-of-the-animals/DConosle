@@ -6,6 +6,7 @@
 #define DCONOSLE_USERFUNC_H
 #include "../../include/datecslib/datecslib.h"
 #include "../../include/datecsException/datecsException.h"
+
 bool connectWhenPortBusy(datecslib &d);
 
 void workNullParam(string port, int cmd, string data, bool endless);
